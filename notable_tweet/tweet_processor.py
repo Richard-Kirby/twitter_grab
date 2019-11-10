@@ -1,6 +1,3 @@
-import tweepy
-import time
-import collections
 import datetime
 import tweepy
 import re
@@ -12,25 +9,7 @@ import re
 #       print(status.text)
 
 
-notable = [
-    ["1635348644", "RaspberryPint"],
-    ["3223426134", "SethAbramson"],
-    ["28162211", "MaxBoot"],
-    ["102725617", "MaxBergman"],
-    ["1140379748268466176", "File411"],
-    ["826382447885574144", "brexit_sham"],
-    ["2324708472", "SaysDana"],
-    ["87818409", "guardian"],
-    ["87818409", "BBCBreaking"],
-    ["14529929", "jaketapper"],
-    ["16973333", "Independent"],
-    ["759251", "CNN"],
-    ["429531188", "Teri_Kanefield"]]
 
-print(notable)
-notable_ids, notable_names = zip(*notable)
-
-print(notable_ids)
 
 
 class TweetPocessor(tweepy.StreamListener):
@@ -52,6 +31,26 @@ class TweetPocessor(tweepy.StreamListener):
 
         self.seth = re.compile('^SethAbramson.*')
         self.seth_re = re.compile('.*RT\s*@SethAbramson.*')
+
+        self.notable = [
+            ["1635348644", "RaspberryPint"],
+            ["3223426134", "SethAbramson"],
+            ["28162211", "MaxBoot"],
+            ["102725617", "MaxBergman"],
+            ["1140379748268466176", "File411"],
+            ["826382447885574144", "brexit_sham"],
+            ["2324708472", "SaysDana"],
+            ["87818409", "guardian"],
+            ["87818409", "BBCBreaking"],
+            ["14529929", "jaketapper"],
+            ["16973333", "Independent"],
+            ["759251", "CNN"],
+            ["429531188", "Teri_Kanefield"]]
+
+        print(notable)
+        notable_ids, notable_names = zip(*notable)
+
+        print(notable_ids)
 
     def on_status(self, status):
         #print(status.id, status.created_at, status.author.screen_name, status.text)

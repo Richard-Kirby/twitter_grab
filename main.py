@@ -1,77 +1,54 @@
-import tweepy
 import time
-import collections
-import datetime
+import led_strip
+import notable_tweet
+import json
+
+with open('credentials.secret') as json_data_file:
+    config = json.load(json_data_file)
+print("API Key", config['twitter_app_credentials']['APIKey'])
+print("API Secret", config['twitter_app_credentials']['APISecret'])
+print("Access Token", config['twitter_app_credentials']['AccessToken'])
+print("Token Secret", config['twitter_app_credentials']['AccessTokenSecret'])
+
+# LED strip configuration:
+LED_COUNT = 180  # Number of LED pixels.
+LED_PIN = 18  # GPIO pin connected to the pixels (must support PWM!).
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
+LED_DMA = 5  # DMA channel to use for generating signal (try 5)
+LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+
+tweet_strip = led_strip.LedStripControl(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+
+colours = [led_strip.rpi_ws281x.Color(255, 0, 0),
+           led_strip.rpi_ws281x.Color(255, 0, 0),
+           led_strip.rpi_ws281x.Color(255, 255, 0),
+           led_strip.rpi_ws281x.Color(0, 255, 0),
+           led_strip.rpi_ws281x.Color(0, 0, 255)]
+
+tweet_strip.pixel_clear()
+
+time.sleep(4)
+
+tweet_strip.set_strip_colours(colours)
+
+
 
 consumer_key = "L0ZMAJxYVbWinZtbSy3ph69dy"
 consumer_secret = "27BVyFWrfGGWz5VLQc5CdqLYdNtVuPHNPGemzgQSRtVF4lnukS"
 access_token = "1635348644-5D2pogpmyUh20XIxFtMcYoNVCQPL958HCkyJqLv"
 access_token_secret = "ynKirsuvYqxdT5LzUNSLLlidX4dfkdoFPDDVTBjVG51aP"
 
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-
-print("Setup up API")
-api = tweepy.API(auth, wait_on_rate_limit=True)
-last_tweet = None
-
-print("Grab Tweets")
-public_tweets = api.home_timeline()
-last_tweet = None
-
-tweet_tuple = collections.namedtuple('tweet_tuple', ['id', 'created_at', 'screen_name', 'text'])
-
-tweet_list = []
-
-notable_screen_name = collections.namedtuple('notable_screen_name', ['screen_name', 'R', 'G', 'B'])
-
-notable_screen_name_list = [['yashar', 0, 255, 255],
-                            ['Trump', 255, 0, 0],
-                            ['SethAbramson', 0,255, 0]]
-
-print(notable_screen_name_list)
-
-
-notable_tweet_tuple = collections.namedtuple('notable_tweet_tuple', ['id', 'created_at', 'screen_name', 'text', 'R', 'G', 'B'])
-notable_tweet_tuple_list = []
+notable_tweet_list = []
+notable_screen_names = []
 
 
 
-while (1):
+tweet_processor = notable_tweet.TweetPocessor(
+                  config['twitter_app_credentials']['APIKey'],
+                  config['twitter_app_credentials']['APISecret'],
+                  config['twitter_app_credentials']['AccessToken'],
+                  config['twitter_app_credentials']['AccessTokenSecret'],
+                  notable_screen_names, notable_tweet_list)
 
-    if public_tweets is not None:
-        for tweet in public_tweets:
-            #print(tweet.id, ": ", tweet.author.screen_name, ": ", tweet.created_at , ": ", tweet.text)
-            new_tweet = tweet_tuple(tweet.id, tweet.created_at, tweet.author.screen_name, tweet.text)
-            #print(new_tweet)
-            #print(new_tweet.screen_name)
-
-            if 'Trump' in new_tweet:
-                print("found Trump", new_tweet)
-            elif 'yashar'in new_tweet:
-                print("found yashar", new_tweet)
-            elif new_tweet.screen_name == 'TheRickWilson':
-                print("RickWilson Found", new_tweet)
-            elif new_tweet.screen_name == 'SethAbramson':
-                print("found Seth Abramson", new_tweet)
-                new_notable_tweet = new_tweet, notable_screen_name('SethAbramson').R, notable_screen_name('SethAbramson').G, notable_screen_name('SethAbramson').B
-
-                notable_tweet_tuple_list.append( new_notable_tweet)
-
-            # Append the new tweet into the list
-            tweet_list.append(new_tweet)
-
-        last_tweet = tweet
-
-
-    time.sleep(120)
-
-    #print("Grab Tweets")
-
-    if last_tweet is None:
-
-        public_tweets = api.home_timeline()
-    else:
-        print("Grab next set of Tweets", datetime.datetime.now())
-        public_tweets = api.home_timeline(since_id = last_tweet.id)
-
+myStream = tweepy.Stream(auth=tweet_processor.api.auth, listener=tweet_processor)
