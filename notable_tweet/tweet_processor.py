@@ -9,11 +9,8 @@ import re
 #       print(status.text)
 
 
-
-
-
 class TweetPocessor(tweepy.StreamListener):
-    def __init__(self, consumer_key, consumer_secret, sccess_token, access_token_secret, notable_screen_names,
+    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, notable_tweeters,
                  notable_tweet_list):
 
         self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -32,25 +29,7 @@ class TweetPocessor(tweepy.StreamListener):
         self.seth = re.compile('^SethAbramson.*')
         self.seth_re = re.compile('.*RT\s*@SethAbramson.*')
 
-        self.notable = [
-            ["1635348644", "RaspberryPint"],
-            ["3223426134", "SethAbramson"],
-            ["28162211", "MaxBoot"],
-            ["102725617", "MaxBergman"],
-            ["1140379748268466176", "File411"],
-            ["826382447885574144", "brexit_sham"],
-            ["2324708472", "SaysDana"],
-            ["87818409", "guardian"],
-            ["87818409", "BBCBreaking"],
-            ["14529929", "jaketapper"],
-            ["16973333", "Independent"],
-            ["759251", "CNN"],
-            ["429531188", "Teri_Kanefield"]]
-
-        print(notable)
-        notable_ids, notable_names = zip(*notable)
-
-        print(notable_ids)
+        self.notable_tweet_list = notable_tweet_list
 
     def on_status(self, status):
         #print(status.id, status.created_at, status.author.screen_name, status.text)
@@ -59,10 +38,15 @@ class TweetPocessor(tweepy.StreamListener):
             self.seth_count = self.seth_count +1
             print("count", self.seth_count)
 
+            tweet_colour = (0,255,0)
+            self.notable_tweet_list.append(tweet_colour)
+
         if self.seth_re.match(status.text) is not None:
             self.seth_re_count = self.seth_re_count +1
             print("re tweet", self.seth_re_count)
 
+            tweet_colour = (255,255,0)
+            self.notable_tweet_list.append(tweet_colour)
 
 '''
     def grab_tweets(self):
@@ -86,11 +70,6 @@ class TweetPocessor(tweepy.StreamListener):
 '''
 
 if __name__ == "__main__":
-    consumer_key = "L0ZMAJxYVbWinZtbSy3ph69dy"
-    consumer_secret = "27BVyFWrfGGWz5VLQc5CdqLYdNtVuPHNPGemzgQSRtVF4lnukS"
-    access_token = "1635348644-5D2pogpmyUh20XIxFtMcYoNVCQPL958HCkyJqLv"
-    access_token_secret = "ynKirsuvYqxdT5LzUNSLLlidX4dfkdoFPDDVTBjVG51aP"
-
     notable_screen_names = []
     notable_tweet_list = []
 

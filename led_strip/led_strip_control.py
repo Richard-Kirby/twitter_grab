@@ -20,8 +20,8 @@ class LedStripControl:
 
     def set_strip_colours(self, colour_list):
         for pixel in range (0, len(colour_list)):
-            print(colour_list[pixel])
-            self.strip.setPixelColor(pixel, colour_list[pixel])
+            #print(colour_list[pixel])
+            self.strip.setPixelColor(pixel, rpi_ws281x.Color(*colour_list[pixel]))
         for pixel in range(len(colour_list), self.strip.numPixels()):
             self.strip.setPixelColor(pixel, rpi_ws281x.Color(0, 0, 0))
 

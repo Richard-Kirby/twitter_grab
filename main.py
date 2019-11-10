@@ -1,14 +1,35 @@
+# external imports
 import time
+import threading
+import json
+import tweepy
+import tweet_watcher
+
+
+# Project imports
 import led_strip
 import notable_tweet
-import json
+
 
 with open('credentials.secret') as json_data_file:
     config = json.load(json_data_file)
-print("API Key", config['twitter_app_credentials']['APIKey'])
-print("API Secret", config['twitter_app_credentials']['APISecret'])
-print("Access Token", config['twitter_app_credentials']['AccessToken'])
-print("Token Secret", config['twitter_app_credentials']['AccessTokenSecret'])
+
+with open('notable_tweeters') as json_data_file:
+    notable_tweeters = json.load(json_data_file)
+
+#print(notable_tweeters)
+
+notable_screen_names = notable_tweeters['notable_tweeters'].keys()
+#print(notable_screen_names)
+
+notable_ids = notable_tweeters['notable_tweeters'].values()
+#print(notable_ids)
+
+
+#print("API Key", config['twitter_app_credentials']['APIKey'])
+#print("API Secret", config['twitter_app_credentials']['APISecret'])
+#print("Access Token", config['twitter_app_credentials']['AccessToken'])
+#print("Token Secret", config['twitter_app_credentials']['AccessTokenSecret'])
 
 # LED strip configuration:
 LED_COUNT = 180  # Number of LED pixels.
@@ -20,28 +41,18 @@ LED_INVERT = False  # True to invert the signal (when using NPN transistor level
 
 tweet_strip = led_strip.LedStripControl(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 
-colours = [led_strip.rpi_ws281x.Color(255, 0, 0),
-           led_strip.rpi_ws281x.Color(255, 0, 0),
-           led_strip.rpi_ws281x.Color(255, 255, 0),
-           led_strip.rpi_ws281x.Color(0, 255, 0),
-           led_strip.rpi_ws281x.Color(0, 0, 255)]
+colours = [(255, 0, 0),
+           (255, 0, 0),
+           (255, 255,0),
+           (0, 255, 0),
+           (0, 0, 255)]
 
 tweet_strip.pixel_clear()
 
 time.sleep(4)
 
 tweet_strip.set_strip_colours(colours)
-
-
-
-consumer_key = "L0ZMAJxYVbWinZtbSy3ph69dy"
-consumer_secret = "27BVyFWrfGGWz5VLQc5CdqLYdNtVuPHNPGemzgQSRtVF4lnukS"
-access_token = "1635348644-5D2pogpmyUh20XIxFtMcYoNVCQPL958HCkyJqLv"
-access_token_secret = "ynKirsuvYqxdT5LzUNSLLlidX4dfkdoFPDDVTBjVG51aP"
-
 notable_tweet_list = []
-notable_screen_names = []
-
 
 
 tweet_processor = notable_tweet.TweetPocessor(
@@ -49,6 +60,14 @@ tweet_processor = notable_tweet.TweetPocessor(
                   config['twitter_app_credentials']['APISecret'],
                   config['twitter_app_credentials']['AccessToken'],
                   config['twitter_app_credentials']['AccessTokenSecret'],
-                  notable_screen_names, notable_tweet_list)
+                  notable_tweeters, notable_tweet_list)
 
 myStream = tweepy.Stream(auth=tweet_processor.api.auth, listener=tweet_processor)
+
+# Set up the watcher thread.  Deals with the active tweetstream.
+tweet_watcher_thread = tweet_watcher.TweetWatcher(notable_tweet_list, tweet_strip)
+tweet_watcher_thread.start()
+
+myStream.filter(follow=notable_ids)
+
+
