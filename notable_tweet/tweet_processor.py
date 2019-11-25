@@ -45,7 +45,7 @@ class TweetPocessor(tweepy.StreamListener):
             self.seth_re_count = self.seth_re_count +1
             print("re tweet", self.seth_re_count)
 
-            tweet_colour = (255,255,0)
+            tweet_colour = (255,0,0)
             self.notable_tweet_list.append(tweet_colour)
 
 '''
