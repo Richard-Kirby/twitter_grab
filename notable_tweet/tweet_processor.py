@@ -38,14 +38,14 @@ class TweetPocessor(tweepy.StreamListener):
             self.seth_count = self.seth_count +1
             print("count", self.seth_count)
 
-            tweet_colour = (0,255,0)
+            tweet_colour = (0,50,0)
             self.notable_tweet_list.append(tweet_colour)
 
         if self.seth_re.match(status.text) is not None:
             self.seth_re_count = self.seth_re_count +1
             print("re tweet", self.seth_re_count)
 
-            tweet_colour = (255,255,0)
+            tweet_colour = (50,0,0)
             self.notable_tweet_list.append(tweet_colour)
 
 '''
