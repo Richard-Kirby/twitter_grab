@@ -19,11 +19,10 @@ with open('notable_tweeters') as json_data_file:
 
 #print(notable_tweeters)
 
-notable_screen_names = notable_tweeters['notable_tweeters'].keys()
-#print(notable_screen_names)
+for each tweeter in notable_tweeters:
+    print tweeter.name
 
-notable_ids = notable_tweeters['notable_tweeters'].values()
-#print(notable_ids)
+
 
 
 #print("API Key", config['twitter_app_credentials']['APIKey'])
@@ -32,7 +31,7 @@ notable_ids = notable_tweeters['notable_tweeters'].values()
 #print("Token Secret", config['twitter_app_credentials']['AccessTokenSecret'])
 
 # LED strip configuration:
-LED_COUNT = 180  # Number of LED pixels.
+LED_COUNT = 180 # Number of LED pixels.
 LED_PIN = 18  # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 5  # DMA channel to use for generating signal (try 5)

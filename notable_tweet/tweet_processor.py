@@ -29,6 +29,25 @@ class TweetPocessor(tweepy.StreamListener):
         self.seth = re.compile('^SethAbramson.*')
         self.seth_re = re.compile('.*RT\s*@SethAbramson.*')
 
+        self.cnn_count = 0
+        self.cnn_re_count = 0
+
+        self.cnn = re.compile('^CNN.*')
+        self.cnn_re = re.compile('.*RT\s*@CNN.*')
+
+        self.bbc_count = 0
+        self.bbc_re_count = 0
+
+        self.bbc = re.compile('^BBC.*')
+        self.bbc_re = re.compile('.*RT\s*@BBC.*')
+
+        self.nytimes_count = 0
+        self.nytimes_re_count = 0
+
+        self.nytimes = re.compile('^nytimes.*')
+        self.nytimes_re = re.compile('.*RT\s*@nytimes.*')
+
+
         self.notable_tweet_list = notable_tweet_list
 
     def on_status(self, status):
@@ -43,10 +62,30 @@ class TweetPocessor(tweepy.StreamListener):
 
         if self.seth_re.match(status.text) is not None:
             self.seth_re_count = self.seth_re_count +1
-            print("re tweet", self.seth_re_count)
-
+            print("seth re tweet", self.seth_re_count)
             tweet_colour = (50,0,0)
             self.notable_tweet_list.append(tweet_colour)
+
+        if self.cnn_re.match(status.text) is not None:
+            self.cnn_re_count = self.cnn_re_count +1
+            print("cnn re tweet", self.cnn_re_count)
+            tweet_colour = (0,0,50)
+            self.notable_tweet_list.append(tweet_colour)
+
+        if self.bbc_re.match(status.text) is not None:
+            self.bbc_re_count = self.bbc_re_count +1
+            print("BBC re tweet", self.bbc_re_count)
+            tweet_colour = (0,50,0)
+            self.notable_tweet_list.append(tweet_colour)
+
+        if self.nytimes_re.match(status.text) is not None:
+            self.nytimes_re_count = self.nytimes_re_count +1
+            print("nytimes re tweet", self.nytimes_re_count)
+            tweet_colour = (0,50,50)
+            self.notable_tweet_list.append(tweet_colour)
+
+
+
 
 '''
     def grab_tweets(self):
