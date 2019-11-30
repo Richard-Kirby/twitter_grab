@@ -1,17 +1,17 @@
 {
-  "notable_tweeters":{
-      {name: "RaspberryPint",   id:"1635348644",            hue:360, sat:100, val:50},
-      {name: "SethAbramson",    id:"3223426134",            hue:260, sat:100, val:50},
-      {name: "MaxBoot",         id: "28162211",             hue:225, sat:100, val:50},
-      {name: "brexit_sham",     id: "826382447885574144",   hue:200, sat:100, val:50},
-      {name: "SaysDana",        id: :"2324708472",          hue:175, sat:100, val:50},
-      {name: "guardian"         id:"87818409",              hue:150, sat:100, val:50},
-      {name:  "BBCBreaking",    id:"87818409",              hue:125, sat:100, val:50},
-      {name: "Independent",     id::"16973333",             hue:100, sat:100, val:50},
-      {name: "jaketapper",      id:"14529929",              hue:75, sat:100, val:50},
-      {name: "CNN",             id:"759251",                hue:50, sat:100, val:50},
-      {name: "Teri_Kanefield",  id:"429531188",             hue:25, sat:100, val:50},
-      {name: "jaketapper",      id:"14529929",              hue:10, sat:100, val:50},
-      {name: "nytimes"          id:"807095",                hue:0, sat:100, val:50}
-    }
+  "tweeters":[
+      {"name": "RaspberryPint",   "id":"1635348644",            "hue":"360", "sat":"100", "val":"50"},
+      {"name": "SethAbramson",    "id":"3223426134",            "hue":"260", "sat":"100", "val":"50"},
+      {"name": "MaxBoot",         "id": "28162211",             "hue":"225", "sat":"100", "val":"50"},
+      {"name": "brexit_sham",     "id": "826382447885574144",   "hue":"200", "sat":"100", "val":"50"},
+      {"name": "SaysDana",        "id":"2324708472",          "hue":"175", "sat":"100", "val":"50"},
+      {"name": "guardian",        "id":"87818409",              "hue":"150", "sat":"100", "val":"50"},
+      {"name":  "BBCBreaking",    "id":"87818409",              "hue":"125", "sat":"100", "val":"50"},
+      {"name": "Independent",     "id" :"16973333",             "hue":"100", "sat":"100", "val":"50"},
+      {"name": "jaketapper",      "id":"14529929",              "hue":"75", "sat":"100", "val":"50"},
+      {"name": "CNN",             "id":"759251",                "hue":"50", "sat":"100", "val":"50"},
+      {"name": "Teri_Kanefield",  "id":"429531188",             "hue":"25", "sat":"100", "val":"50"},
+      {"name": "jaketapper",      "id":"14529929",              "hue":"10", "sat":"100", "val":"50"},
+      {"name": "nytimes",          "id":"807095",                "hue":"0", "sat":"100", "val":"50"}
+    ]
 }

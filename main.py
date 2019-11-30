@@ -19,16 +19,9 @@ with open('notable_tweeters') as json_data_file:
 
 #print(notable_tweeters)
 
-for each tweeter in notable_tweeters:
-    print tweeter.name
-
-
-
-
-#print("API Key", config['twitter_app_credentials']['APIKey'])
-#print("API Secret", config['twitter_app_credentials']['APISecret'])
-#print("Access Token", config['twitter_app_credentials']['AccessToken'])
-#print("Token Secret", config['twitter_app_credentials']['AccessTokenSecret'])
+notable_ids = []
+for tweeter in notable_tweeters["tweeters"]:
+    notable_ids.append(tweeter["id"])
 
 # LED strip configuration:
 LED_COUNT = 180 # Number of LED pixels.
