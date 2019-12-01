@@ -1,18 +1,30 @@
-#import pigpio
 import time
 import rpi_ws281x
-#import random
-#import threading
+import random
 
-# Set up the pigpio library.
-#pi = pigpio.pi()
-
+gamma8 = [
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
+    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
+    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
+  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
+  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
+  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
+  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255]
 
 class LedStripControl:
 
     def __init__(self, led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness):
 
-        self.strip = rpi_ws281x.Adafruit_NeoPixel(led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness)
+        self.strip = rpi_ws281x.Adafruit_NeoPixel(led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness, gamma= gamma8)
 
         # Intialize the library (must be called once before other functions).
         self.strip.begin()
@@ -26,6 +38,18 @@ class LedStripControl:
             self.strip.setPixelColor(pixel, rpi_ws281x.Color(0, 0, 0))
 
         self.strip.show()
+
+    # Twinkle (turn off some of the pixels according to the ratio specified
+    def twinkle(self, colour_list, ratio):
+
+        # Calculate the number of pixels to twinkle
+        twinkle_pixels = int(len(colour_list) * ratio)
+
+        for i in range (twinkle_pixels):
+            off_pixel = random.randint(0, len(colour_list)-1)
+            colour_list[off_pixel] = (0,0,0)
+
+        self.set_strip_colours(colour_list)
 
 
     def pixel_clear(self):
@@ -59,85 +83,3 @@ if __name__ == "__main__":
     tweet_strip.set_strip_colours(colours)
 
 
-# Create NeoPixel object with appropriate configuration.
-
-
-'''
-class PixelShow(threading.Thread):
-
-    def __init__(self, strip, wait=0.1):
-        super(PixelShow, self).__init__()
-        self.strip = strip
-        self.wait = wait
-        print("Pixel show thread")
-
-    def run(self):
-
-        while True:
-
-            for pix in range (0, 180):
-                # determine if off or on and then multiply by a brightness
-                self.strip.setPixelColor(pix, rpi_ws281x.Color(random.randint(0,1) * random.randint(0,255), 0, 0))
-            self.strip.show()
-
-            time.sleep(self.wait)
-
-
-pixel_thread = PixelShow(strip, 0.08)
-
-pixel_thread.start()
-
-
-try:
-
-    print("Press Ctrl-C to finish")
-
-    pixel_clear()
-
-    # main loop
-    while True:
-
-
-        for value in range (20, 72, 10):
-
-            # mister full on.
-            pi.set_PWM_dutycycle(mister_pin, 255)
-
-
-            # Wait for a few seconds to let mist build
-            time.sleep(10)
-
-            #for y in range(1, 50):
-            #    strip.setPixelColor(random.randint(0,179), rpi_ws281x.Color(random.randint(0,255), 0, 0))
-            #strip.show()
-
-            print("PWM: ", value)
-
-            # fan on for a bit and then off again to complete cycle
-            pi.set_PWM_dutycycle(pwm_fan_control_pin, int(float(value/100) *255))
-
-            time.sleep(4)
-
-            # fan on for a bit and then off again to complete cycle
-            pi.set_PWM_dutycycle(pwm_fan_control_pin, 0)
-
-            time.sleep(2)
-
-
-
-except KeyboardInterrupt:
-    print("Control-C received")
-
-# Clean up to finish -important to turn pins off.
-finally:
-    print("final cleanup")
-    pi.set_PWM_dutycycle(mister_pin, 0)
-    pi.set_PWM_dutycycle(pwm_fan_control_pin, 0)
-
-    #pi.hardware_PWM(pwm_fan_control_pin, 25000, 0)
-    pi.stop()
-
-    pixel_clear()
-
-    #unicornhat.off()
-'''

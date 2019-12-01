@@ -1,14 +1,43 @@
 import datetime
 import tweepy
 import re
+import colorsys
+
+class Tweeter:
+
+    def __init__(self, tweeter_info):
+        self.name = tweeter_info["name"]
+        self.id = tweeter_info["id"]
+        self.colour = colorsys.hsv_to_rgb(float(tweeter_info["hue"]), float(tweeter_info["sat"]), float(tweeter_info["val"]))
+        self.colour = (int(self.colour[0] * 255), int(self.colour[1] * 255), int(self.colour[2] * 255))
+
+        tweet_string_re = "^" + self.name+ ".*"
+        print(tweet_string_re)
+        self.tweet_re = re.compile(tweet_string_re)
+        retweet_string_re = ".*RT.*" + self.name + ".*"
+
+        print(retweet_string_re)
+        self.retweet_re = re.compile(retweet_string_re)
+        self.re_count = 0
+        self.count = 0
+
+
+    def check_tweet(self, tweet):
+        #print("tweet check", tweet.text)
+        if self.tweet_re.match(tweet.text) is not None:
+            print("tweet>>", self.name)
+            self.count = self.count+1
+            ret_colour = self.colour
+        elif self.retweet_re.match(tweet.text) is not None:
+            self.re_count = self.re_count +1
+            print("<<retweet", self.name, self.re_count)
+            ret_colour = self.colour
+        else:
+            ret_colour = None
+        return ret_colour
+
 
 # override tweepy.StreamListener to add logic to on_status
-# class MyStreamListener(tweepy.StreamListener):
-#
-#    def on_status(self, status):   
-#       print(status.text)
-
-
 class TweetPocessor(tweepy.StreamListener):
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, notable_tweeters,
                  notable_tweet_list):
@@ -21,92 +50,24 @@ class TweetPocessor(tweepy.StreamListener):
 
         tweepy.StreamListener.__init__(self, api=self.api)
 
-        self.seth_count = 0
-        self.seth_re_count = 0
+        self.tweeters =[]
 
-        self.last_tweet = None
-
-        self.seth = re.compile('^SethAbramson.*')
-        self.seth_re = re.compile('.*RT\s*@SethAbramson.*')
-
-        self.cnn_count = 0
-        self.cnn_re_count = 0
-
-        self.cnn = re.compile('^CNN.*')
-        self.cnn_re = re.compile('.*RT\s*@CNN.*')
-
-        self.bbc_count = 0
-        self.bbc_re_count = 0
-
-        self.bbc = re.compile('^BBC.*')
-        self.bbc_re = re.compile('.*RT\s*@BBC.*')
-
-        self.nytimes_count = 0
-        self.nytimes_re_count = 0
-
-        self.nytimes = re.compile('^nytimes.*')
-        self.nytimes_re = re.compile('.*RT\s*@nytimes.*')
-
+        for tweeter in notable_tweeters["tweeters"]:
+            new_tweeter = Tweeter(tweeter)
+            #print (new_tweeter)
+            self.tweeters.append(new_tweeter)
 
         self.notable_tweet_list = notable_tweet_list
 
     def on_status(self, status):
         #print(status.id, status.created_at, status.author.screen_name, status.text)
 
-        if self.seth.match(status.text) is not None:
-            self.seth_count = self.seth_count +1
-            print("count", self.seth_count)
+        for tweeter in self.tweeters:
+            ret_colour = tweeter.check_tweet(status)
+            if ret_colour is not None:
+                #print(ret_colour)
+                self.notable_tweet_list.append(ret_colour)
 
-            tweet_colour = (0,50,0)
-            self.notable_tweet_list.append(tweet_colour)
-
-        if self.seth_re.match(status.text) is not None:
-            self.seth_re_count = self.seth_re_count +1
-            print("seth re tweet", self.seth_re_count)
-            tweet_colour = (50,0,0)
-            self.notable_tweet_list.append(tweet_colour)
-
-        if self.cnn_re.match(status.text) is not None:
-            self.cnn_re_count = self.cnn_re_count +1
-            print("cnn re tweet", self.cnn_re_count)
-            tweet_colour = (0,0,50)
-            self.notable_tweet_list.append(tweet_colour)
-
-        if self.bbc_re.match(status.text) is not None:
-            self.bbc_re_count = self.bbc_re_count +1
-            print("BBC re tweet", self.bbc_re_count)
-            tweet_colour = (0,50,0)
-            self.notable_tweet_list.append(tweet_colour)
-
-        if self.nytimes_re.match(status.text) is not None:
-            self.nytimes_re_count = self.nytimes_re_count +1
-            print("nytimes re tweet", self.nytimes_re_count)
-            tweet_colour = (0,50,50)
-            self.notable_tweet_list.append(tweet_colour)
-
-
-
-
-'''
-    def grab_tweets(self):
-
-        while (1):
-            print("Grab Tweets", datetime.datetime.now())
-
-            if self.last_tweet is None:
-
-                public_tweets = self.api.home_timeline()
-
-            else:
-                public_tweets = self.api.home_timeline(since_id=self.last_tweet)
-
-            if public_tweets is not None:
-                for tweet in public_tweets:
-                    # print(tweet.id, ": ", tweet.author.screen_name, ": ", tweet.created_at , ": ", tweet.text)
-                    print(tweet.id, tweet.created_at, tweet.author.screen_name, tweet.full_text)
-
-            self.last_tweet = tweet.id
-'''
 
 if __name__ == "__main__":
     notable_screen_names = []

@@ -10,19 +10,6 @@ import tweet_watcher
 import led_strip
 import notable_tweet
 
-
-with open('credentials.secret') as json_data_file:
-    config = json.load(json_data_file)
-
-with open('notable_tweeters') as json_data_file:
-    notable_tweeters = json.load(json_data_file)
-
-#print(notable_tweeters)
-
-notable_ids = []
-for tweeter in notable_tweeters["tweeters"]:
-    notable_ids.append(tweeter["id"])
-
 # LED strip configuration:
 LED_COUNT = 180 # Number of LED pixels.
 LED_PIN = 18  # GPIO pin connected to the pixels (must support PWM!).
@@ -31,22 +18,23 @@ LED_DMA = 5  # DMA channel to use for generating signal (try 5)
 LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
 
-tweet_strip = led_strip.LedStripControl(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 
-colours = [(255, 0, 0),
-           (255, 0, 0),
-           (255, 255,0),
-           (0, 255, 0),
-           (0, 0, 255)]
+# Grab the credentials.
+with open('credentials.secret') as json_data_file:
+    config = json.load(json_data_file)
 
-tweet_strip.pixel_clear()
+# Grab the twitter ids we are interested in.
+with open('notable_tweeters') as json_data_file:
+    notable_tweeters = json.load(json_data_file)
 
-time.sleep(4)
+# Build a list of notable IDs to follow from the JSON file
+notable_ids = []
+for tweeter in notable_tweeters["tweeters"]:
+    notable_ids.append(tweeter["id"])
 
-tweet_strip.set_strip_colours(colours)
 notable_tweet_list = []
 
-
+# Initialise the tweet processor - this deals with the stream.
 tweet_processor = notable_tweet.TweetPocessor(
                   config['twitter_app_credentials']['APIKey'],
                   config['twitter_app_credentials']['APISecret'],
@@ -54,12 +42,16 @@ tweet_processor = notable_tweet.TweetPocessor(
                   config['twitter_app_credentials']['AccessTokenSecret'],
                   notable_tweeters, notable_tweet_list)
 
+# Set up the twitter stream, uses the processor created above.
 myStream = tweepy.Stream(auth=tweet_processor.api.auth, listener=tweet_processor)
 
-# Set up the watcher thread.  Deals with the active tweetstream.
+# Set up the neo-pixel strip for use by the twitter analyser
+tweet_strip = led_strip.LedStripControl(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+tweet_strip.pixel_clear()
+
+# Set up the watcher thread.  This deals with the output from the tweet processor.
 tweet_watcher_thread = tweet_watcher.TweetWatcher(notable_tweet_list, tweet_strip)
 tweet_watcher_thread.start()
 
+# Specify the filter for the stream.
 myStream.filter(follow=notable_ids)
-
-

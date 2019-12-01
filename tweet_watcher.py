@@ -16,6 +16,8 @@ class TweetWatcher(threading.Thread):
 
         last_len = 0
         try:
+            mod_list = []
+
             while (1):
 
                 if len(self.notable_tweet_list) > last_len:
@@ -23,7 +25,7 @@ class TweetWatcher(threading.Thread):
 
                     wrap = len(self.notable_tweet_list)// self.led_strip.strip.numPixels()
                     mod = len(self.notable_tweet_list) % self.led_strip.strip.numPixels()
-                    print(wrap, ":", mod)
+                    #print(wrap, ":", mod)
 
                     mod_list =[]
                     for i in range (self.led_strip.strip.numPixels()):
@@ -42,7 +44,13 @@ class TweetWatcher(threading.Thread):
 
                     self.led_strip.set_strip_colours(mod_list)
 
-                time.sleep(4)
+                time.sleep(0.1)
+
+                self.led_strip.twinkle(mod_list, 0.25)
+
+                time.sleep(0.1)
+
+
 
         except KeyboardInterrupt:
             print("closing")
