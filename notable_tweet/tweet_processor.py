@@ -25,13 +25,13 @@ class Tweeter:
     def check_tweet(self, tweet):
         #print("tweet check", tweet.text)
         if self.tweet_re.match(tweet.text) is not None:
-            print("tweet>>", self.name)
+            print("tweet>>", self.name,self.count, self.colour)
             self.count = self.count+1
             ret_colour = self.colour
         elif self.retweet_re.match(tweet.text) is not None:
             self.re_count = self.re_count +1
-            print("<<retweet", self.name, self.re_count)
             ret_colour = self.colour
+            print("<<retweet", self.name, self.re_count, ret_colour)
         else:
             ret_colour = None
         return ret_colour
