@@ -2,6 +2,7 @@ import time
 import rpi_ws281x
 import random
 
+# Gamma correction makes the colours perceived correctly.
 gamma8 = [
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
@@ -20,8 +21,11 @@ gamma8 = [
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255]
 
+
+# Class to  control the LED Strip based on the tweets.
 class LedStripControl:
 
+    # Set up the strip with the passed parameters.  The Gamma correction is done by the library, so it gete passed in.
     def __init__(self, led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness):
 
         self.strip = rpi_ws281x.Adafruit_NeoPixel(led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness, gamma= gamma8)
@@ -29,29 +33,40 @@ class LedStripControl:
         # Intialize the library (must be called once before other functions).
         self.strip.begin()
 
-
-    def set_strip_colours(self, colour_list):
-        for pixel in range (0, len(colour_list)):
+    # Set the stip colours according to the passed in list.  Set Twinkle Ratio to 0 if you don't want any twinkle.
+    def set_strip_colours(self, tweet_list, twinkle_ratio = 0.25, tweeter_filter = None):
+        for pixel in range (0, len(tweet_list)):
             #print(colour_list[pixel])
-            self.strip.setPixelColor(pixel, rpi_ws281x.Color(*colour_list[pixel]))
-        for pixel in range(len(colour_list), self.strip.numPixels()):
-            self.strip.setPixelColor(pixel, rpi_ws281x.Color(0, 0, 0))
+            #print(pixel, tweet_list[pixel].name)
+
+            twinkle_on_off = random.random()
+            #print(twinkle_on_off)
+
+            # If no filter, the show all pixels.
+            if tweeter_filter is None:
+                if float(twinkle_on_off) < float(twinkle_ratio):
+                    self.strip.setPixelColor(pixel, rpi_ws281x.Color(0, 0, 0))
+                else:
+                    self.strip.setPixelColor(pixel, rpi_ws281x.Color(*tweet_list[pixel].colour))
+
+            # Check against the filter
+            elif tweet_list[pixel].id is tweeter_filter.id:
+                self.strip.setPixelColor(pixel, rpi_ws281x.Color(*tweet_list[pixel].colour))
+
+            # Otherwise set to off.
+            else:
+                self.strip.setPixelColor(pixel, rpi_ws281x.Color(0,0,0))
+
+
+            #self.strip.setPixelColor(pixel, rpi_ws281x.Color(*tweet_list[pixel].colour))
+
+        # The below commented out bit sets the rest to dark.
+        for pixel in range(len(tweet_list), self.strip.numPixels()):
+           self.strip.setPixelColor(pixel, rpi_ws281x.Color(0, 0, 0))
 
         self.strip.show()
 
-    # Twinkle (turn off some of the pixels according to the ratio specified
-    def twinkle(self, colour_list, ratio):
-
-        # Calculate the number of pixels to twinkle
-        twinkle_pixels = int(len(colour_list) * ratio)
-
-        for i in range (twinkle_pixels):
-            off_pixel = random.randint(0, len(colour_list)-1)
-            colour_list[off_pixel] = (0,0,0)
-
-        self.set_strip_colours(colour_list)
-
-
+    # Clears al the pixels.
     def pixel_clear(self):
         # Clear all the pixels
         for i in range(0, self.strip.numPixels()):  # Green Red Blue

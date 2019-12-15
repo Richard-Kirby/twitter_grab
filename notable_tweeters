@@ -11,6 +11,9 @@
       {"name": "jaketapper",      "id":"14529929",              "hue":".2", "sat":"1.00", "val":".50"},
       {"name": "CNN",             "id":"759251",                "hue":".1", "sat":"1.00", "val":".50"},
       {"name": "Teri_Kanefield",  "id":"429531188",             "hue":".15", "sat":"1.0", "val":".50"},
-      {"name": "nytimes",          "id":"807095",                "hue":".75", "sat":"1.00", "val":".50"}
+      {"name": "nytimes",          "id":"807095",                "hue":".75", "sat":"1.00", "val":".50"},
+      {"name": "msnbc",            "id":"2836421",                "hue":".75", "sat":"1.00", "val":".50"},
+      {"name": "washingtonpost",   "id":"2467791",                "hue":".75", "sat":"1.00", "val":".50"}
+
     ]
 }

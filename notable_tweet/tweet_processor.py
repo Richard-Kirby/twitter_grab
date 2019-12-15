@@ -3,8 +3,11 @@ import tweepy
 import re
 import colorsys
 
+
+# Class for each tweeter that is being followed.  Knows how to check for tweets or re-tweets.
 class Tweeter:
 
+    # Set up reg exs, colours, etc.
     def __init__(self, tweeter_info):
         self.name = tweeter_info["name"]
         self.id = tweeter_info["id"]
@@ -21,35 +24,41 @@ class Tweeter:
         self.re_count = 0
         self.count = 0
 
-
+    # Checks the tweet against its own name to see if a tweet or re-tweet.
     def check_tweet(self, tweet):
         #print("tweet check", tweet.text)
+
+        # Check against the two regexes looking for tweet.
         if self.tweet_re.match(tweet.text) is not None:
             print("tweet>>", self.name,self.count, self.colour)
             self.count = self.count+1
-            ret_colour = self.colour
+            ret_value = 'tweet'
+
+        # As above re-tweet check
         elif self.retweet_re.match(tweet.text) is not None:
             self.re_count = self.re_count +1
-            ret_colour = self.colour
-            print("<<retweet", self.name, self.re_count, ret_colour)
+            ret_value = 're-tweet'
+            print("<<retweet", self.name, self.re_count, self.colour)
+
+        # None value - is not my tweet or re-tweet.
         else:
-            ret_colour = None
-        return ret_colour
+            ret_value = None
+        return ret_value
 
 
-# override tweepy.StreamListener to add logic to on_status
+# override tweepy.StreamListener to add logic to on_status.  Sets everything up and gets the tweets processed.
 class TweetPocessor(tweepy.StreamListener):
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, notable_tweeters,
                  notable_tweet_list):
 
+        # Setting up the API as per standard Tweepy process.
         self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_token_secret)
-
-        print("Setup up API")
         self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
 
         tweepy.StreamListener.__init__(self, api=self.api)
 
+        # Build the list of tweeters being watched.
         self.tweeters =[]
 
         for tweeter in notable_tweeters["tweeters"]:
@@ -59,14 +68,19 @@ class TweetPocessor(tweepy.StreamListener):
 
         self.notable_tweet_list = notable_tweet_list
 
+    # This gets run whenever a new tweet comes in.  It figures out who tweeted or was re-tweeted.
     def on_status(self, status):
         #print(status.id, status.created_at, status.author.screen_name, status.text)
 
+        #Pass the tweet to the object so it can check if it is one its tweets involved.
         for tweeter in self.tweeters:
-            ret_colour = tweeter.check_tweet(status)
-            if ret_colour is not None:
+            tweet_or_re_tweet = tweeter.check_tweet(status)
+
+            # Check the return value of the tweet check.  Add the tweeter to the list of tweets if
+            # tweeted or re-tweeted.
+            if tweet_or_re_tweet is not None:
                 #print(ret_colour)
-                self.notable_tweet_list.append(ret_colour)
+                self.notable_tweet_list.append(tweeter)
 
 
 if __name__ == "__main__":
