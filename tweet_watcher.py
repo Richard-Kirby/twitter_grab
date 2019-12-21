@@ -51,7 +51,7 @@ class TweetWatcher(threading.Thread):
                     tweeters = set(mod_list)
                     for tweeter in tweeters:
                         self.led_strip.set_strip_colours(mod_list, tweeter_filter = tweeter)
-                        print("Filter id:{} name:{} count{}:" .format( tweeter.id, tweeter.name, mod_list.count(tweeter)))
+                        print("Filter \t\t\tid:{:20} name:{:30} count:{:10}" .format( tweeter.id, tweeter.name, mod_list.count(tweeter)))
                         time.sleep(0.2)
 
                     last_tweeter_display = summarise_calc

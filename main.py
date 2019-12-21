@@ -49,9 +49,19 @@ myStream = tweepy.Stream(auth=tweet_processor.api.auth, listener=tweet_processor
 tweet_strip = led_strip.LedStripControl(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 tweet_strip.pixel_clear()
 
-# Set up the watcher thread.  This deals with the output from the tweet processor.
-tweet_watcher_thread = tweet_watcher.TweetWatcher(notable_tweet_list, tweet_strip)
-tweet_watcher_thread.start()
+try:
 
-# Specify the filter for the stream.
-myStream.filter(follow=notable_ids)
+    # Set up the watcher thread.  This deals with the output from the tweet processor.
+    tweet_watcher_thread = tweet_watcher.TweetWatcher(notable_tweet_list, tweet_strip)
+    tweet_watcher_thread.start()
+
+    # Specify the filter for the stream.
+    myStream.filter(follow=notable_ids)
+
+except:
+
+    for i in range (5):
+        time.sleep(2)
+        print("Exception retry", i)
+        myStream.filter(follow=notable_ids)
+
