@@ -19,7 +19,7 @@ LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
 
 
-# Grab the credentials.
+# Grab the credentials.  TODO: everyone has to get their own credentials.  Not in the repo.
 with open('credentials.secret') as json_data_file:
     config = json.load(json_data_file)
 
@@ -58,10 +58,14 @@ try:
     # Specify the filter for the stream.
     myStream.filter(follow=notable_ids)
 
-except:
+except (KeyboardInterrupt, SystemExit):
+    raise
 
-    for i in range (5):
-        time.sleep(2)
-        print("Exception retry", i)
-        myStream.filter(follow=notable_ids)
+except:
+    # report error and proceed
+    print("something failed during to get the twitter feed - not sure why but fails once in a while - try restart")
+    raise
+
+finally:
+    print("Finishing Off")
 
